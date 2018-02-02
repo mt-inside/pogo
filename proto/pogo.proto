@@ -1,0 +1,15 @@
+syntax="proto3";
+
+package uk.org.empty.pogo;
+
+service PogoD {
+    rpc Add (Task) returns (Unit) { }
+    rpc List (Unit) returns (stream Task) { }
+}
+
+message Unit {
+}
+
+message Task {
+    string title = 1;
+}
