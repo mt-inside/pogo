@@ -10,7 +10,7 @@ filegroup(
 )
 
 go_proto_library(
-    name = "go_default_library",
+    name = "go",
     protos = [":protos"],
     with_grpc = True,
     verbose = 1,

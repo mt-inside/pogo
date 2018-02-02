@@ -1,4 +1,4 @@
-workspace(name = "org_uk_empty_pogod")
+workspace(name = "org_uk_empty_pogo")
 
 # ================================================================
 

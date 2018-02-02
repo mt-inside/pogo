@@ -2,7 +2,7 @@ syntax="proto3";
 
 package uk.org.empty.pogo;
 
-service PogoD {
+service Pogo {
     rpc Add (Task) returns (Unit) { }
     rpc List (Unit) returns (stream Task) { }
 }

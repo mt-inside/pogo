@@ -9,6 +9,6 @@ go_binary(
         "main.go",
     ],
     deps = [
-        "//proto:go_default_library",
+        "//proto:go",
     ] + GRPC_COMPILE_DEPS,
 )

@@ -3,10 +3,10 @@
 FROM bazel as build
 WORKDIR /app
 COPY . .
-RUN bazel build //main:pogod
+RUN bazel build //pogod:pogod
 
 FROM scratch
-COPY --from=build /app/bazel-bin/main/linux_amd64_stripped/pogod /
+COPY --from=build /app/bazel-bin/pogod/linux_amd64_stripped/pogod /
 
 EXPOSE 8080
 CMD ["/pogod"]

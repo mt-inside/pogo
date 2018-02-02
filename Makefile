@@ -4,10 +4,10 @@ PROD_IMAGE := pogod
 
 # Local
 build:
-	bazel build //main:pogod
+	bazel build //pogod:pogod
 
 run:
-	bazel run //main:pogod
+	bazel run //pogod:pogod
 
 # Production docker image
 image:
