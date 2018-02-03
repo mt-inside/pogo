@@ -1,6 +1,6 @@
 syntax="proto3";
 
-package uk.org.empty.pogo;
+package pogobuf;
 
 service Pogo {
     rpc Add (Task) returns (Unit) { }
