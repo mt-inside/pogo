@@ -1,38 +1,31 @@
-POGO_SRC_REL := github.com/mt-inside/pogo
-POGO_SRC_ABS := /go/src/$(POGO_SRC_REL)
-POGOD_SRC_REL := $(POGO_SRC_REL)/pogod
-POGOD_SRC_ABS := /go/src/$(POGOD_SRC_REL)
+POGO_REL := github.com/mt-inside/pogo
+CONTAINER_POGO_ABS := /go/src/$(POGO_REL)
 BUILD_IMAGE := golang-pogo-builder
 DEV_IMAGE := golang-pogo-builder-dev
-PROD_IMAGE := pogod
 
-# Local
-build:
-	go generate ./pogod
-	go install ./pogod
+.PHONY: image image-run .builder-image .dev-image docker-dev
 
-run:
-	go run ./pogod/main.go
-
-# Production docker image
-image: .builder-image
-	docker build -t $(PROD_IMAGE) .
+image:
+	docker build -t $(PROD_IMAGE) -f ./Dockerfile $(ROOT)
 
 image-run: image
-	docker run -p8080:8080 $(PROD_IMAGE)
+	docker run --network pogo_net $(PROD_IMAGE)
+#TODO: make a dockercompose you idiot. Separate dockerfiles in subdirs.
+#	Write separate make then work out how to factor it out later
+
 
 # "Docker monad"
 .builder-image:
-	docker build -t $(BUILD_IMAGE) build-image
+	docker build -t $(BUILD_IMAGE) $(ROOT)/build-image
 
 .dev-image: .builder-image
-	docker build -t $(DEV_IMAGE) -f build-image/Dockerfile.dev build-image
+	docker build -t $(DEV_IMAGE) -f $(ROOT)/build-image/Dockerfile.dev $(ROOT)/build-image
 
-docker-%:
+docker-%: .builder-image
 	docker run \
-	    -v $(shell pwd):$(POGO_SRC_ABS) \
+	    -v $(shell realpath $(ROOT)):$(CONTAINER_POGO_ABS) \
 	    $(BUILD_IMAGE) \
-	    /bin/sh -c "cd $(POGO_SRC_ABS) && make $*"
+	    /bin/sh -c "cd $(CONTAINER_POGO_ABS)/$(HERE) && make $*"
 
 docker-dev: .dev-image
-	docker run -ti -v $(shell pwd):$(POGO_SRC_ABS) $(DEV_IMAGE)
+	docker run -ti -v $(shell realpath $(ROOT)):$(CONTAINER_POGO_ABS) $(DEV_IMAGE)

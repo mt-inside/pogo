@@ -3,9 +3,9 @@
 FROM golang-pogo-builder as build
 WORKDIR /go/src/github.com/mt-inside/pogo
 COPY . .
-RUN go generate ./pogod
+RUN go generate ./pogod/...
 ENV CGO_ENABLED=0
-RUN go install ./pogod
+RUN go install ./pogod/...
 
 FROM scratch
 COPY --from=build /go/bin/pogod /
