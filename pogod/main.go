@@ -8,6 +8,7 @@ import (
 	"net"
 
 	"github.com/mt-inside/pogo/pogod/data"
+	"github.com/mt-inside/pogo/pogod/tasks"
 
 	pb "github.com/mt-inside/pogo/proto"
 	"google.golang.org/grpc"
@@ -20,9 +21,11 @@ const (
 
 type pogo_server struct{}
 
-func (s *pogo_server) Add(ctxt context.Context, t *pb.Task) (*pb.Unit, error) {
-	log.Printf("Adding task %v", t)
-	data.Add(t)
+// This is really looking like it should be an MVC...
+
+func (s *pogo_server) Add(ctxt context.Context, pt *pb.ProtoTask) (*pb.Unit, error) {
+	log.Printf("Adding task %v", pt)
+	data.Add(pt)
 
 	return &pb.Unit{}, nil
 }
@@ -30,11 +33,29 @@ func (s *pogo_server) Add(ctxt context.Context, t *pb.Task) (*pb.Unit, error) {
 func (s *pogo_server) List(_ *pb.Unit, stream pb.Pogo_ListServer) error {
 	log.Println("Listing tasks")
 	for _, t := range data.List() {
-		if err := stream.Send(t); err != nil {
+		if err := stream.Send(t.ToPB()); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (s *pogo_server) Start(ctxt context.Context, id *pb.Id) (*pb.Unit, error) {
+	log.Printf("Request to start task %v", id)
+	t := data.Find(id.Idx)
+	tasks.Start(t)
+	log.Printf("Started task %v", t)
+
+	return &pb.Unit{}, nil
+}
+
+func (s *pogo_server) Complete(ctxt context.Context, id *pb.Id) (*pb.Unit, error) {
+	log.Printf("Request to complete task %v", id)
+	t := data.Find(id.Idx)
+	t.State = tasks.Done
+	log.Printf("Completed task %v", t)
+
+	return &pb.Unit{}, nil
 }
 
 func main() {

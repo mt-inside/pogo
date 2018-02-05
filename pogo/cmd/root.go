@@ -19,7 +19,7 @@ func init() {
 }
 
 func initConfig() {
-	log.Printf("Configured cobra")
+	//log.Printf("Configured cobra")
 }
 
 var rootCmd = &cobra.Command{

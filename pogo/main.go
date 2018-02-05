@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/mt-inside/pogo/pogo/cmd"
-	"github.com/mt-inside/pogo/pogo/task"
+	"github.com/mt-inside/pogo/pogo/tasks"
 
 	pb "github.com/mt-inside/pogo/proto"
 	"google.golang.org/grpc"
@@ -26,6 +26,6 @@ func main() {
 	defer conn.Close()
 	// TODO: nope
 	pogo := pb.NewPogoClient(conn)
-	task.NewTaskClientHack(pogo)
+	tasks.NewTaskClientHack(pogo)
 	cmd.Execute()
 }

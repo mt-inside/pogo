@@ -3,13 +3,23 @@ syntax="proto3";
 package pogobuf;
 
 service Pogo {
-    rpc Add (Task) returns (Unit) { }
+    rpc Add (ProtoTask) returns (Unit) { }
     rpc List (Unit) returns (stream Task) { }
+    rpc Start (Id) returns (Unit) { }
+    rpc Complete (Id) returns (Unit) { }
 }
 
 message Unit {
 }
 
+message Id {
+    int64 idx = 1;
+}
+
+message ProtoTask {
+    string title = 1;
+}
 message Task {
     string title = 1;
+    Id id = 2;
 }
