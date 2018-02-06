@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mt-inside/pogo/pogo/tasks"
 	"github.com/spf13/cobra"
 
+	"github.com/mt-inside/pogo/pogo/tasks"
 	pb "github.com/mt-inside/pogo/proto"
 )
 

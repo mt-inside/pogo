@@ -7,6 +7,7 @@ service Pogo {
     rpc List (Unit) returns (stream Task) { }
     rpc Start (Id) returns (Unit) { }
     rpc Complete (Id) returns (Unit) { }
+    rpc GetState (Unit) returns (PogoState) { }
 }
 
 message Unit {
@@ -22,4 +23,15 @@ message ProtoTask {
 message Task {
     string title = 1;
     Id id = 2;
+}
+
+message PogoState {
+    enum State {
+        IDLE = 0;
+        TASK = 1;
+        BREAK = 2;
+    }
+    State state = 1;
+    Task task = 2;
+    uint32 remainingTime = 3;
 }

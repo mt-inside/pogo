@@ -12,11 +12,20 @@ var (
 	pogo pb.PogoClient
 )
 
-/* This should convert PBs to and from internal types, but since we don't
+/* This should convert PBs to and from internal types (so they can be
+* rendered by the effectful layer), but since we don't
 * have any yet, just deal externally in PBs */
 
 func NewTaskClientHack(p pb.PogoClient) {
 	pogo = p
+}
+
+func State() *pb.PogoState {
+	state, err := pogo.GetState(context.Background(), &pb.Unit{})
+	if err != nil {
+		log.Fatalf("%v.State(_) = _, %v", pogo, err)
+	}
+	return state
 }
 
 func AddTask(t *pb.ProtoTask) {

@@ -1,4 +1,4 @@
-package tasks
+package task
 
 import (
 	pb "github.com/mt-inside/pogo/proto"
@@ -19,6 +19,9 @@ type Task struct {
 
 func (t *Task) ToPB() *pb.Task {
 	return &pb.Task{Id: &pb.Id{t.Id}, Title: t.Title}
+}
+func NewTask(idx int64, title string) *Task {
+	return &Task{Id: idx, Title: title}
 }
 func NewTaskFromPBProto(pbt *pb.ProtoTask, idx int64) *Task {
 	return &Task{Id: idx, Title: pbt.Title}

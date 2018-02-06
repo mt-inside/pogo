@@ -1,8 +1,7 @@
 package data
 
 import (
-	. "github.com/mt-inside/pogo/pogod/tasks"
-	pb "github.com/mt-inside/pogo/proto"
+	. "github.com/mt-inside/pogo/pogod/task"
 )
 
 var (
@@ -10,8 +9,8 @@ var (
 	next_idx int64           = 0
 )
 
-func Add(pt *pb.ProtoTask) {
-	t := NewTaskFromPBProto(pt, next_idx)
+func Add(title string) {
+	t := NewTask(next_idx, title)
 	tasks[next_idx] = t
 
 	next_idx += 1
@@ -27,9 +26,3 @@ func Find(id int64) *Task {
 	}
 	panic("no such task id")
 }
-
-/*func List() (ts []*Task) {
-    for _, t := range tasks {
-        ts = append(ts, t)
-    }
-}*/
