@@ -31,24 +31,22 @@ var rootCmd = &cobra.Command{
 	Long: `A client-server pomodoro timer system. Pogo supports multiple
 	notification mechanisms and can produce timesheets`,
 	Run: func(cmd *cobra.Command, args []string) {
-		s := tasks.State()
+		s := tasks.GetStatus()
 
 		/* TODO: use some library to template this into a txt snippet?
 		 * Add colour? */
-		if s.State == pb.PogoState_IDLE {
+		if s.State == pb.Status_IDLE {
 			fmt.Println("    IDLE")
 			listCommand.Run(listCommand, make([]string, 0))
 		} else {
-			if s.State == pb.PogoState_TASK {
+			if s.State == pb.Status_TASK {
 				fmt.Println("    RUNNING")
-			} else if s.State == pb.PogoState_BREAK {
+			} else if s.State == pb.Status_BREAK {
 				fmt.Println("    BREAK")
 			}
-			fmt.Println()
-			fmt.Println()
-			fmt.Printf("        %v\n", s.Task)
-			fmt.Println()
-			fmt.Printf("        Time remaining: %d\n", s.RemainingTime)
+			// TODO: really does need to be an interal type becuase it needs to be printable
+			fmt.Printf("%d: %s [%s]\n", s.Task.Id.Idx, s.Task.Title, s.Task.State)
+			fmt.Printf("Time remaining: %d\n", s.RemainingTime)
 		}
 	},
 }

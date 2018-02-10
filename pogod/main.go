@@ -15,10 +15,6 @@ import (
 
 // TODO: split repos (can inclue from another repo easily in go), vendor
 // protos
-// Go TODO, deps.txt from frog, translate to github issues (use hub.exe)
-// add viper to pogod
-// think about where to render, filter, and validate input. See how kubectl
-// does it. Record decision in LADR
 const (
 	port string = ":50001"
 )
@@ -30,6 +26,8 @@ func main() {
 	}
 	srv := grpc.NewServer()
 	pb.RegisterPogoServer(srv, &cmd.PogoServer{})
+	pb.RegisterTasksServer(srv, &cmd.TasksServer{})
+	// Turn on reflection so that clients can dynamically query our services
 	reflection.Register(srv)
 	log.Printf("serving on %v", port)
 	if err := srv.Serve(sock); err != nil {

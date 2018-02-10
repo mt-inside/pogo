@@ -1,84 +1,54 @@
 package tasks
 
 import (
-	"log"
-	"time"
-
-	"github.com/mt-inside/pogo/pogod/data"
+	"github.com/mt-inside/pogo/pogod/model"
 	. "github.com/mt-inside/pogo/pogod/task"
 )
 
-/* TODO: find tasks etc in here
-* factor out a separate state machine file which has an actual 2d
-* activation table thing so that you can't make the wrong transitions
+/* TODO: find tasks etc in here. Easier to return gRPC errors from here,
+* doesn't rely on any FSM data
  */
-type PogodState int
-
-const (
-	Idle PogodState = iota
-	RunningTask
-	RunningBreak
-)
-
-type Pogod struct {
-	State PogodState
-	Task  *Task
-}
-
-var pogod *Pogod = &Pogod{Idle, nil}
-
-func State() (s PogodState, task *Task, time uint32) {
-	s = pogod.State
-	task = pogod.Task
-	time = 0 //TODO
-
-	return
-}
 
 func Add(title string) {
-	data.Add(title)
+	model.Add(title)
 }
 
 func List() []*Task {
 	ts := make([]*Task, 0)
-	for _, t := range data.List() {
+	for _, t := range model.List() {
 		ts = append(ts, t)
 	}
 	return ts
 }
 
-func Start(id int64) {
-	t := data.Find(id)
-
-	pogod.State = RunningTask
-	pogod.Task = t
-
-	timer := time.NewTimer(5 * time.Second)
-	go func() {
-		<-timer.C
-		stop(t)
-	}()
-
-	log.Printf("Started task %v", t)
+func Status() (PogodState, *Task, uint32) {
+	ret := post(StatusEvent, nil)
+	stat := ret.(*StatusResult)
+	return stat.state, stat.task, stat.remain
 }
 
-func stop(t *Task) {
-	pogod.State = Idle
-	pogod.Task = nil
-	log.Printf("Stopped task %v", t)
+func Start(id int64) error {
+	/* this is 12 kinds of nasty.
+	 * Should really have a "startRet" type, which is unpacked here. That's what ret.(error) is degenerately doing
+	 * But, err, as a field, would be typed, so could just be used, nil or not. Here we have to change type, and that panics if it's nil (even though we know that's ok), so we use the two-return version just to get... the zero type... which happens to be nil.
+	 * Then we have to "use" ok.*/
+	/* Should also be building a "StartArgs" here, but it's unary atm so meh */
+	ret := post(StartEvent, id)
+	err, ok := ret.(error)
+	ok = ok
+	return err
 }
 
-func Complete(id int64) {
-	t := data.Find(id)
-
-	t.State = Done
-
-	log.Printf("Completed task %v", t)
+func Stop() error {
+	ret := post(StopEvent, nil)
+	err, ok := ret.(error)
+	ok = ok
+	return err
 }
 
-//TODO: state machine for the whole thing, that's what starts a task. in
-//TODO: there needs to be an actor. A single source of truth and mediator
-//layer, that will e.g. complete task 1 when 2 is running, but not 2.
-//layer1: grpc server - unmarshals args to internal types (e.g. protoTask)
-//layer2: tasks actor: mediates everything, finds existing objects, etc.
-//Talks to task db, timers, audit db, main state machine (which is a db)
+func Complete(id int64) error {
+	ret := post(CompleteEvent, id)
+	err, ok := ret.(error)
+	ok = ok
+	return err
+}

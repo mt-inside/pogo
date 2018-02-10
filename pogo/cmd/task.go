@@ -17,6 +17,7 @@ func init() {
 	taskCommand.AddCommand(addCommand)
 	taskCommand.AddCommand(listCommand)
 	taskCommand.AddCommand(startCommand)
+	taskCommand.AddCommand(stopCommand)
 	taskCommand.AddCommand(completeCommand)
 }
 
@@ -37,7 +38,8 @@ var addCommand = &cobra.Command{
 	Long:  "TODO",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		tasks.AddTask(&pb.ProtoTask{Title: strings.Join(args, " ")})
+		/* Id left to default and ignored at the other end */
+		tasks.AddTask(&pb.Task{Title: strings.Join(args, " ")})
 	},
 }
 
@@ -48,7 +50,7 @@ var listCommand = &cobra.Command{
 	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, t := range tasks.ListTasks() {
-			fmt.Printf("%d: %s\n", t.Id.Idx, t.Title)
+			fmt.Printf("%d: %s [%s]\n", t.Id.Idx, t.Title, t.State)
 		}
 	},
 }
@@ -65,12 +67,21 @@ func validTaskId(cmd *cobra.Command, args []string) error {
 
 var startCommand = &cobra.Command{
 	Use:   "start",
-	Short: "Start a pomodoro, working on Task",
+	Short: "Start a pomodoro, working on the specified task",
 	Long:  "TODO",
 	Args:  validTaskId,
 	Run: func(cmd *cobra.Command, args []string) {
 		id, _ := strconv.ParseInt(args[0], 10, 64)
 		tasks.StartTask(id)
+	},
+}
+
+var stopCommand = &cobra.Command{
+	Use:   "stop",
+	Short: "Stop working on current task",
+	Long:  "TODO",
+	Run: func(cmd *cobra.Command, args []string) {
+		tasks.StopTask()
 	},
 }
 

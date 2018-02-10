@@ -5,41 +5,38 @@ import (
 	"io"
 	"log"
 
-	pb "github.com/mt-inside/pogo/proto"
-)
+	"github.com/mt-inside/pogo/pogo/clients"
 
-var (
-	pogo pb.PogoClient
+	pb "github.com/mt-inside/pogo/proto"
 )
 
 /* This should convert PBs to and from internal types (so they can be
 * rendered by the effectful layer), but since we don't
 * have any yet, just deal externally in PBs */
 
-func NewTaskClientHack(p pb.PogoClient) {
-	pogo = p
-}
-
-func State() *pb.PogoState {
-	state, err := pogo.GetState(context.Background(), &pb.Unit{})
+func GetStatus() *pb.Status {
+	pogo := clients.GetPogoClient()
+	status, err := pogo.GetStatus(context.Background(), &pb.Unit{})
 	if err != nil {
 		log.Fatalf("%v.State(_) = _, %v", pogo, err)
 	}
-	return state
+	return status
 }
 
-func AddTask(t *pb.ProtoTask) {
-	_, err := pogo.Add(context.Background(), t)
+func AddTask(t *pb.Task) {
+	tasks := clients.GetTasksClient()
+	_, err := tasks.Add(context.Background(), t)
 	if err != nil {
-		log.Fatalf("%v.List(_) = _, %v", pogo, err)
+		log.Fatalf("%v.List(_) = _, %v", tasks, err)
 	}
 }
 
 func ListTasks() (ts []*pb.Task) {
+	tasks := clients.GetTasksClient()
 	// Background == default (no cancel, timeout, etc)
-	stream, err := pogo.List(context.Background(), &pb.Unit{})
+	stream, err := tasks.List(context.Background(), &pb.TaskFilter{})
 	if err != nil {
-		log.Fatalf("%v.List(_) = _, %v", pogo, err)
+		log.Fatalf("%v.List(_) = _, %v", tasks, err)
 	}
 	for {
 		t, err := stream.Recv()
@@ -47,7 +44,7 @@ func ListTasks() (ts []*pb.Task) {
 			break
 		}
 		if err != nil {
-			log.Fatalf("%v.List(_) = _, %v", pogo, err)
+			log.Fatalf("%v.List(_) = _, %v", tasks, err)
 		}
 		ts = append(ts, t)
 	}
@@ -55,15 +52,25 @@ func ListTasks() (ts []*pb.Task) {
 }
 
 func StartTask(id int64) {
-	_, err := pogo.Start(context.Background(), &pb.Id{id})
+	tasks := clients.GetTasksClient()
+	_, err := tasks.Start(context.Background(), &pb.Id{id})
 	if err != nil {
-		log.Fatalf("%v.Start(_) = _, %v", pogo, err)
+		log.Fatalf("%v.Start(_) = _, %v", tasks, err)
+	}
+}
+
+func StopTask() {
+	tasks := clients.GetTasksClient()
+	_, err := tasks.Stop(context.Background(), &pb.Unit{})
+	if err != nil {
+		log.Fatalf("%v.Stop(_) = _, %v", tasks, err)
 	}
 }
 
 func CompleteTask(id int64) {
-	_, err := pogo.Complete(context.Background(), &pb.Id{id})
+	tasks := clients.GetTasksClient()
+	_, err := tasks.Complete(context.Background(), &pb.Id{id})
 	if err != nil {
-		log.Fatalf("%v.Complete(_) = _, %v", pogo, err)
+		log.Fatalf("%v.Complete(_) = _, %v", tasks, err)
 	}
 }

@@ -2,36 +2,82 @@ syntax="proto3";
 
 package pogobuf;
 
-service Pogo {
-    rpc Add (ProtoTask) returns (Unit) { }
-    rpc List (Unit) returns (stream Task) { }
-    rpc Start (Id) returns (Unit) { }
-    rpc Complete (Id) returns (Unit) { }
-    rpc GetState (Unit) returns (PogoState) { }
-}
+import "google/protobuf/timestamp.proto";
 
 message Unit {
 }
+
 
 message Id {
     int64 idx = 1;
 }
 
-message ProtoTask {
-    string title = 1;
-}
-message Task {
-    string title = 1;
-    Id id = 2;
+enum TaskState {
+    TODO = 0;
+    DONE = 1;
 }
 
-message PogoState {
-    enum State {
+enum TaskType {
+    TASK = 0;
+    BREAK = 1;
+}
+
+message Task {
+    Id id = 1;
+    string title = 2;
+    TaskState state = 3;
+    TaskType type = 4;
+}
+
+enum TaskFields {
+    dummy = 0;
+    id = 1;
+    title = 2;
+    state = 4;
+    type = 8;
+}
+
+message TaskFilter {
+    TaskFields fields = 1;
+}
+
+/* Server does: filtering
+ * Client does: rendering
+ */
+service Tasks {
+    rpc Add (Task) returns (Unit) { }
+    rpc List (TaskFilter) returns (stream Task) { }
+    rpc Start (Id) returns (Unit) { }
+    rpc Stop (Unit) returns (Unit) { }
+    rpc Complete (Id) returns (Unit) { }
+}
+
+
+message DateRange {
+    google.protobuf.Timestamp start = 1;
+    google.protobuf.Timestamp end = 2;
+}
+
+message Report { /* TODO */ }
+
+service Reports {
+    rpc Get(DateRange) returns (Report) { }
+}
+
+
+message Status {
+    enum SystemState {
         IDLE = 0;
         TASK = 1;
         BREAK = 2;
     }
-    State state = 1;
+    SystemState state = 1;
     Task task = 2;
     uint32 remainingTime = 3;
+}
+
+service Pogo {
+    // TODO: how does kubectl do watches? Is this where we should
+    // "WatchState"?
+    rpc GetStatus (Unit) returns (Status) { }
 }
