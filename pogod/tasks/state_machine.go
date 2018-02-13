@@ -4,15 +4,13 @@ import (
 	"log"
 	"time"
 
+	"github.com/spf13/viper"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/mt-inside/pogo/pogod/model"
 	. "github.com/mt-inside/pogo/pogod/task"
-)
-
-const (
-	pomoDuration = 10 * time.Second
 )
 
 type PogodState int /* FSM: S */
@@ -45,6 +43,7 @@ func (d PogodData) addTimer() PogodData {
 		panic("Should not be a timer")
 	}
 
+	pomoDuration := time.Duration(viper.GetInt("pomodoro_time")) * time.Minute
 	d.Timer = time.NewTimer(pomoDuration)
 	d.StartTime = time.Now()
 	d.EndTime = d.StartTime.Add(pomoDuration)
