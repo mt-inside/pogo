@@ -7,20 +7,43 @@ import (
 type TaskState int
 
 const (
-	Todo TaskState = iota
-	Done
+	Dummy1 TaskState = 0
+	TODO             = 1
+	DONE             = 2
+)
+
+type TaskType int
+
+const (
+	Dummy2 TaskType = 0
+	TASK            = 1
+	BREAK           = 2
 )
 
 type Task struct {
-	Id    int64
-	Title string
-	State TaskState
+	Id       int64
+	Title    string
+	Category string
+	State    TaskState
+	Type     TaskType
 }
 
 func (t *Task) ToPB() *pb.Task {
-	return &pb.Task{Id: &pb.Id{t.Id}, Title: t.Title, State: pb.TaskState(t.State)}
+	return &pb.Task{
+		Id:       &pb.Id{t.Id},
+		Title:    t.Title,
+		Category: t.Category,
+		State:    pb.TaskState(t.State),
+		Type:     pb.TaskType(t.Type),
+	}
 }
 
-func NewTask(idx int64, title string) *Task {
-	return &Task{Id: idx, Title: title}
+func NewTask(idx int64, title string, category string) *Task {
+	return &Task{
+		Id:       idx,
+		Title:    title,
+		Category: category,
+		State:    TODO,
+		Type:     TASK,
+	}
 }

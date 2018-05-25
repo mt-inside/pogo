@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/mt-inside/pogo/pogo/tasks"
 	pb "github.com/mt-inside/pogo/proto"
@@ -19,10 +21,38 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	/* Config sources, in viper presidence order */
+
+	/* Defaults */
+	viper.SetDefault("category", "default")
+
+	/* Config file */
+	viper.SetConfigName("config") /* e.g. config.yaml, config.json */
+	viper.AddConfigPath("$HOME/.pogo/")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		//Also goes off for no config file
+		//log.Fatalf("Fatal error in config file: %s \n", err)
+	}
+	/* ...with auto-reload */
+	viper.WatchConfig()
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		log.Println("Config file changed:", e.Name)
+		viper.Debug()
+	})
+
+	/* Environment */
+	viper.SetEnvPrefix("pogo")
+	viper.AutomaticEnv() /* e.g. POGO_CATEGORY */
+
+	/* Command-line args */
+	// category flag is under taskCommand
 }
 
 func initConfig() {
 	//log.Printf("Configured cobra")
+
 }
 
 var rootCmd = &cobra.Command{
@@ -37,6 +67,7 @@ var rootCmd = &cobra.Command{
 		 * Add colour? */
 		if s.State == pb.Status_IDLE {
 			fmt.Println("    IDLE")
+			fmt.Println("Category: ", viper.GetString("category"))
 			listCommand.Run(listCommand, make([]string, 0))
 		} else {
 			if s.State == pb.Status_TASK {
@@ -45,8 +76,9 @@ var rootCmd = &cobra.Command{
 				fmt.Println("    BREAK")
 			}
 			// TODO: really does need to be an interal type becuase it needs to be printable
-			fmt.Printf("%d: %s [%s]\n", s.Task.Id.Idx, s.Task.Title, s.Task.State)
-			fmt.Printf("Time remaining: %d\n", s.RemainingTime)
+			fmt.Println("Category: ", viper.GetString("category"))
+			fmt.Println(RenderTask(s.Task))
+			fmt.Println("Time remaining: ", s.RemainingTime)
 		}
 	},
 }

@@ -9,6 +9,8 @@ import (
 
 	"github.com/mt-inside/pogo/pogod/tasks"
 
+	"github.com/mt-inside/pogo/pogod/model"
+	"github.com/mt-inside/pogo/pogod/task"
 	pb "github.com/mt-inside/pogo/proto"
 )
 
@@ -16,19 +18,46 @@ type TasksServer struct{}
 
 func (s *TasksServer) Add(ctxt context.Context, t *pb.Task) (*pb.Unit, error) {
 	log.Printf("Adding task %v", t)
-	tasks.Add(t.Title) /* Ignore ID, if it were even set */
+	new_id := model.NextTaskId()
+	task := task.NewTask(new_id, t.Title, t.Category) /* Ignore user-specified ID, if it were even set */
+	tasks.Add(task)
 
 	return &pb.Unit{}, nil
 }
 
 func (s *TasksServer) List(f *pb.TaskFilter, stream pb.Tasks_ListServer) error {
 	log.Println("Listing tasks")
-	if f.Fields != 0 {
+	if (f.Fields &^ pb.TaskFields_category &^ pb.TaskFields_state &^ pb.TaskFields_type) != 0 {
 		panic("unsupported filter option")
 	}
+
 	for _, t := range tasks.List() {
-		if err := stream.Send(t.ToPB()); err != nil {
-			return err
+		include := true
+
+		if f.Fields&pb.TaskFields_id != 0 {
+			include = false
+		}
+		if f.Fields&pb.TaskFields_title != 0 {
+			include = false
+		}
+		if f.Fields&pb.TaskFields_category != 0 &&
+			f.Task.Category != t.Category {
+			include = false
+		}
+		if f.Fields&pb.TaskFields_state != 0 &&
+			int32(f.Task.State)&int32(t.State) == 0 {
+
+			include = false
+		}
+		if f.Fields&pb.TaskFields_type != 0 &&
+			int32(f.Task.Type) != int32(t.Type) {
+			include = false
+		}
+
+		if include {
+			if err := stream.Send(t.ToPB()); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

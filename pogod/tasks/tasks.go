@@ -9,8 +9,8 @@ import (
 * doesn't rely on any FSM data
  */
 
-func Add(title string) {
-	model.Add(title)
+func Add(task *Task) {
+	model.Add(task)
 }
 
 func List() []*Task {

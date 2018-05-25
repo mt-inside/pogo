@@ -31,10 +31,10 @@ func AddTask(t *pb.Task) {
 	}
 }
 
-func ListTasks() (ts []*pb.Task) {
+func ListTasks(filter *pb.TaskFilter) (ts []*pb.Task) {
 	tasks := clients.GetTasksClient()
 	// Background == default (no cancel, timeout, etc)
-	stream, err := tasks.List(context.Background(), &pb.TaskFilter{})
+	stream, err := tasks.List(context.Background(), filter)
 	if err != nil {
 		log.Fatalf("%v.List(_) = _, %v", tasks, err)
 	}

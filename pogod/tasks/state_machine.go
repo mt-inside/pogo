@@ -161,7 +161,7 @@ func idle_start(state PogodState, data PogodData, args interface{}) (PogodState,
 	if !found {
 		return Idle, &data, status.Errorf(codes.NotFound, "No such task")
 	}
-	if t.State == Done {
+	if t.State == DONE {
 		return Idle, &data, status.Errorf(codes.FailedPrecondition, "Task already complete")
 	}
 
@@ -192,10 +192,10 @@ func idle_complete(state PogodState, data PogodData, args interface{}) (PogodSta
 	if !found {
 		return Idle, &data, status.Errorf(codes.NotFound, "No such task")
 	}
-	if t.State == Done {
+	if t.State == DONE {
 		return Idle, &data, status.Errorf(codes.FailedPrecondition, "Task already completed")
 	}
-	t.State = Done
+	t.State = DONE
 	// data doesn't have a task to clear
 
 	log.Printf("Completed task %v", t)
@@ -212,7 +212,7 @@ func task_start(state PogodState, data PogodData, args interface{}) (PogodState,
 	if !found {
 		return state, &data, status.Errorf(codes.NotFound, "No such task")
 	}
-	if t.State == Done {
+	if t.State == DONE {
 		return state, &data, status.Errorf(codes.FailedPrecondition, "Task already completed")
 	}
 	// tasks don't change state
@@ -257,7 +257,7 @@ func task_complete(state PogodState, data PogodData, args interface{}) (PogodSta
 	if !found {
 		return state, &data, status.Errorf(codes.NotFound, "No such task")
 	}
-	if t.State == Done {
+	if t.State == DONE {
 		return state, &data, status.Errorf(codes.FailedPrecondition, "Task already completed")
 	}
 
@@ -281,7 +281,7 @@ func task_complete(state PogodState, data PogodData, args interface{}) (PogodSta
 	}
 
 	/* Complete the task no matter what */
-	t.State = Done
+	t.State = DONE
 
 	log.Printf("Completed task %v", t)
 

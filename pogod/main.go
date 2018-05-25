@@ -17,8 +17,6 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-// TODO: split repos (can inclue from another repo easily in go), vendor
-// protos
 const (
 	port string = ":50001"
 )

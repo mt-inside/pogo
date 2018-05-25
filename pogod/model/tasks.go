@@ -19,14 +19,17 @@ var (
 	next_idx int64           = 0
 )
 
-func Add(title string) {
+func NextTaskId() (id int64) {
+	id = next_idx
+	next_idx += 1
+	return
+}
+
+func Add(task *Task) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	t := NewTask(next_idx, title)
-	tasks[next_idx] = t
-
-	next_idx += 1
+	tasks[task.Id] = task
 }
 
 func List() map[int64]*Task {

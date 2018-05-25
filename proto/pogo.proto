@@ -2,7 +2,7 @@ syntax="proto3";
 
 package pogobuf;
 
-import "google/protobuf/timestamp.proto";
+//import "google/protobuf/timestamp.proto";
 
 message Unit {
 }
@@ -12,33 +12,41 @@ message Id {
     int64 idx = 1;
 }
 
+/* Bitmap */
 enum TaskState {
-    TODO = 0;
-    DONE = 1;
+    dummy1 = 0;
+    TODO = 1;
+    DONE = 2;
 }
 
+/* Bitmap */
 enum TaskType {
-    TASK = 0;
-    BREAK = 1;
+    dummy2 = 0;
+    TASK = 1;
+    BREAK = 2;
 }
 
 message Task {
     Id id = 1;
     string title = 2;
-    TaskState state = 3;
-    TaskType type = 4;
+    string category = 3;
+    TaskState state = 4;
+    TaskType type = 5;
 }
 
+/* Bitmap */
 enum TaskFields {
-    dummy = 0;
+    dummy3 = 0;
     id = 1;
     title = 2;
-    state = 4;
-    type = 8;
+    category = 4;
+    state = 8;
+    type = 16;
 }
 
 message TaskFilter {
-    TaskFields fields = 1;
+    Task task = 1;
+    TaskFields fields = 2;
 }
 
 /* Server does: filtering
@@ -54,8 +62,8 @@ service Tasks {
 
 
 message DateRange {
-    google.protobuf.Timestamp start = 1;
-    google.protobuf.Timestamp end = 2;
+    //google.protobuf.Timestamp start = 1;
+    //google.protobuf.Timestamp end = 2;
 }
 
 message Report { /* TODO */ }
