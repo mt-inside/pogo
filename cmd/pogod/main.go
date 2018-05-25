@@ -1,6 +1,6 @@
 package main
 
-//go:generate protoc -I ../proto --go_out=plugins=grpc:../proto ../proto/pogo.proto
+//go:generate protoc -I ../../api --go_out=plugins=grpc:../../api ../../api/pogo.proto
 
 import (
 	"log"
@@ -10,9 +10,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/mt-inside/pogo/pogod/cmd"
-
-	pb "github.com/mt-inside/pogo/proto"
+	pb "github.com/mt-inside/pogo/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -29,8 +27,8 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	srv := grpc.NewServer()
-	pb.RegisterPogoServer(srv, &cmd.PogoServer{})
-	pb.RegisterTasksServer(srv, &cmd.TasksServer{})
+	pb.RegisterPogoServer(srv, &PogoServer{})
+	pb.RegisterTasksServer(srv, &TasksServer{})
 	// Turn on reflection so that clients can dynamically query our services
 	reflection.Register(srv)
 	log.Printf("serving on %v", port)

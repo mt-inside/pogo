@@ -1,12 +1,12 @@
-package cmd
+package main
 
 import (
 	"context"
 	"log"
 
-	"github.com/mt-inside/pogo/pogod/tasks"
+	"github.com/mt-inside/pogo/pkg/pogod/tasks"
 
-	pb "github.com/mt-inside/pogo/proto"
+	pb "github.com/mt-inside/pogo/api"
 )
 
 type PogoServer struct{}

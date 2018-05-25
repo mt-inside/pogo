@@ -1,4 +1,4 @@
-package cmd
+package main
 
 /* Marshalls and unmarshalls types from gRPC to internal types (mostly
 * primitives) */
@@ -7,11 +7,10 @@ import (
 	"context"
 	"log"
 
-	"github.com/mt-inside/pogo/pogod/tasks"
-
-	"github.com/mt-inside/pogo/pogod/model"
-	"github.com/mt-inside/pogo/pogod/task"
-	pb "github.com/mt-inside/pogo/proto"
+	pb "github.com/mt-inside/pogo/api"
+	"github.com/mt-inside/pogo/pkg/pogod/model"
+	"github.com/mt-inside/pogo/pkg/pogod/task"
+	"github.com/mt-inside/pogo/pkg/pogod/tasks"
 )
 
 type TasksServer struct{}

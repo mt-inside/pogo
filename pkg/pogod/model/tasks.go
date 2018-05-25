@@ -3,7 +3,7 @@ package model
 import (
 	"sync"
 
-	. "github.com/mt-inside/pogo/pogod/task"
+	. "github.com/mt-inside/pogo/pkg/pogod/task"
 )
 
 var (

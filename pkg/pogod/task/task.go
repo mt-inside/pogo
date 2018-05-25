@@ -1,7 +1,7 @@
 package task
 
 import (
-	pb "github.com/mt-inside/pogo/proto"
+	pb "github.com/mt-inside/pogo/api"
 )
 
 type TaskState int

@@ -5,9 +5,9 @@ import (
 	"io"
 	"log"
 
-	"github.com/mt-inside/pogo/pogo/clients"
+	"github.com/mt-inside/pogo/pkg/pogo/clients"
 
-	pb "github.com/mt-inside/pogo/proto"
+	pb "github.com/mt-inside/pogo/api"
 )
 
 /* This should convert PBs to and from internal types (so they can be

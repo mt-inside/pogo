@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/mt-inside/pogo/pogod/model"
-	. "github.com/mt-inside/pogo/pogod/task"
+	"github.com/mt-inside/pogo/pkg/pogod/model"
+	. "github.com/mt-inside/pogo/pkg/pogod/task"
 )
 
 type PogodState int /* FSM: S */

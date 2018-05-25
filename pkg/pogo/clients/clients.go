@@ -3,7 +3,7 @@ package clients
 import (
 	"log"
 
-	pb "github.com/mt-inside/pogo/proto"
+	pb "github.com/mt-inside/pogo/api"
 	"google.golang.org/grpc"
 )
 

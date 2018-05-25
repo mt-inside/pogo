@@ -1,4 +1,4 @@
-package cmd
+package commands
 
 import (
 	"errors"
@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/mt-inside/pogo/pogo/tasks"
-	pb "github.com/mt-inside/pogo/proto"
+	pb "github.com/mt-inside/pogo/api"
+	"github.com/mt-inside/pogo/pkg/pogo/tasks"
 )
 
 func init() {

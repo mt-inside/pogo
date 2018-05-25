@@ -1,8 +1,8 @@
 package tasks
 
 import (
-	"github.com/mt-inside/pogo/pogod/model"
-	. "github.com/mt-inside/pogo/pogod/task"
+	"github.com/mt-inside/pogo/pkg/pogod/model"
+	. "github.com/mt-inside/pogo/pkg/pogod/task"
 )
 
 /* TODO: find tasks etc in here. Easier to return gRPC errors from here,
