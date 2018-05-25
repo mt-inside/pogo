@@ -29,3 +29,14 @@ docker-%: .builder-image
 
 docker-dev: .dev-image
 	docker run -ti -v $(shell realpath $(ROOT)):$(CONTAINER_POGO_ABS) $(DEV_IMAGE)
+
+
+pogo:
+	CGO_ENABLED=0
+	go generate github.com/mt-inside/pogo/cmd/pogo
+	go install github.com/mt-inside/pogo/cmd/pogo
+
+pogod:
+	CGO_ENABLED=0
+	go generate github.com/mt-inside/pogo/cmd/pogod
+	go install github.com/mt-inside/pogo/cmd/pogod
