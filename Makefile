@@ -33,10 +33,13 @@ docker-dev: .dev-image
 
 pogo:
 	CGO_ENABLED=0
-	go generate github.com/mt-inside/pogo/cmd/pogo
-	go install github.com/mt-inside/pogo/cmd/pogo
+	vgo generate github.com/mt-inside/pogo/cmd/pogo
+	vgo install github.com/mt-inside/pogo/cmd/pogo
 
 pogod:
 	CGO_ENABLED=0
-	go generate github.com/mt-inside/pogo/cmd/pogod
-	go install github.com/mt-inside/pogo/cmd/pogod
+	vgo generate github.com/mt-inside/pogo/cmd/pogod
+	vgo install github.com/mt-inside/pogo/cmd/pogod
+
+pogod-image:
+	docker build -t hack --build-arg binary=pogod -f ./Dockerfile .
