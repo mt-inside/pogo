@@ -53,7 +53,7 @@ func ListTasks(filter *pb.TaskFilter) (ts []*pb.Task) {
 
 func StartTask(id int64) {
 	tasks := clients.GetTasksClient()
-	_, err := tasks.Start(context.Background(), &pb.Id{id})
+	_, err := tasks.Start(context.Background(), &pb.Id{Idx: id})
 	if err != nil {
 		log.Fatalf("%v.Start(_) = _, %v", tasks, err)
 	}
@@ -69,7 +69,7 @@ func StopTask() {
 
 func CompleteTask(id int64) {
 	tasks := clients.GetTasksClient()
-	_, err := tasks.Complete(context.Background(), &pb.Id{id})
+	_, err := tasks.Complete(context.Background(), &pb.Id{Idx: id})
 	if err != nil {
 		log.Fatalf("%v.Complete(_) = _, %v", tasks, err)
 	}

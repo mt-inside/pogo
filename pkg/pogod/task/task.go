@@ -30,7 +30,7 @@ type Task struct {
 
 func (t *Task) ToPB() *pb.Task {
 	return &pb.Task{
-		Id:       &pb.Id{t.Id},
+		Id:       &pb.Id{Idx: t.Id},
 		Title:    t.Title,
 		Category: t.Category,
 		State:    pb.TaskState(t.State),
