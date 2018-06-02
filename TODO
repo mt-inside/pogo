@@ -1,0 +1,109 @@
+TODO: do the TODOs, commit
+Then: don't just mutate model objects in place in the state machine; call to the data layer to modify them, which writes diff events into the event stream
+
+move to logrus, add context
+
+Make decisions on this stuff, add ADRs
+
+== client/server ==
+  // think about where to render, filter, and validate input. See how kubectl
+  // does it. Record decision in LADR
+
+James M:
+- watch daniel smith "kube style APIs for the future"
+- everthing server-side
+  - validation (though client can fail fast too, especially if it's in the same langauge and can re-use code)
+  - rendering (done with table types - client just asks for table format, as opposed to list, wide list, whole object)
+  - streaming (done with another header that tell server to hold open and http/2 push)
+
+
+move rendering of lists server-side
+- k8s' very RESTful API returns a different type, Table, for the same endpoint https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/server-get.md
+- gRPC ideas: this is a RESTful API too, it's just the implementation is gRPC not JSON.
+  - JSON effectively has tagged types (k8s sends an accept-type HTTP header then returns a tagged json)
+  - can do this with gRPC
+    - make a union type for each thing that adds our Table
+    - use Google.Any to send /either/ the thing or Table (in response to an optional Kind arg in the getter)
+  - or add separate endpoints (GetFoo(), GetFooAsTable())
+
+think about how to do description too
+- Tables where Rows have parents (then do a topological sort)
+- Tables where Rows can have Rows as children (basically a Tree type)
+- an expliciy Tree type
+
+think about whether to keep any rendering of raw types, or just dump the generated proto struct?
+- would avoid any client-side own types at all?
+
+
+pogo data: write a redux-style data store and reducers
+TODO play with redux first!!
+- make the events into the database async (down a channel)
+- make the reducers simple and sync first (actually just hvae these be event handlers first - not quite sure what reducers are)
+- make the reducers push not pull (i.e. they have to walk over each item in the todo list, checking if the event applies and maybe chaning it, so refactor them to take one item and a next() callback)
+  - well, ideall you can do this with RxGo if it exists?
+- keep the last 5, define the reverse of all of them, impliment undo
+
+add task edit (to change title)
+filtering by task next, so we can limit to a category
+when implimented, put in a rdr
+put all of this into githib issues:
+write github / gitlab job importer (look at pomo.rb), eat own face
+reports could be a node/D3 website, but for now make a prom exporter and publish a docker image with that + grafana + dashboard
+all time when stopped counted as a break
+tasks to have a type: work, break
+when 25 mins timer goes off, picks a break and starts a 5min timer. You can stop that, or it'll time out. Can start another break task over it but again 5 mins contiguous. THen it goes idle
+break tasks to be loaded at start-up from a config file (for now)
+all repot items rounded up by ratio of work to work+break
+task to gain last-started-time field, used to sort a lot of outputs
+pogo:
+- root: task.status()
+- start, stop, etc
+- report --format (dump, text template? csv? json? markdown?)
+make a pogo-server container image containing pogod, pogo-reportd, prom exporter, grafana
+pogo-reportd to connect to the db (so pogo:report_dump() for now, cassandra later), crunch the numbers (including trying to id day boundaries of breaks >8h to work out day start and end, hence efficiency, dump it all into redis and pogo-reportd offers another API over that with the enriched schema - it's this that the website / prom talks to)
+pogo should then maybe have a raw-data-dump cmd (talks to cassandra) and a report cmd (talks to reportd)
+complete should complete the currenly running task without any arguments, named task with them (use a one-of message: idx, current)
+cli should try to parse id as an int - if it's inly numbers then use it as an id, otherwise try task name prefix match (i.e. every grpc method takes a task and a taskfilter)
+add categories. README that I use 1mtd to manage my time, the 5 things today are /outcomes/ - "work on project X", a big jira issue, admin. Make a category for an atomic unit of billing, e.g. a JIRA ticket or a customer. "Pogo category set foo" to change default category, all tasks made under this category, list shows that category only. reports by category
+- this will make it easy to switch contexts (e.g. as a day-by-day consultant) and pick up where you left off
+- maybe have a category of "default" which means "i'm not using them" then when you make a task it's put in a category of one
+
+try to remove boilerplate by extending protobuf types throughout both sides, augmenting them as FooEx by struct embedding where necessary
+
+
+How to make watches work? How does kubectl do it?
+
+fundamentally used the wrong language for pogod - should be scala akka.
+pogo should be go becuase of cobra and the niceness of distribution
+
+split into separate repos (the have separate arch etc), vendor the protos
+look into viper
+
+randomised break activities
+- bike manouvre
+- run round the block
+- pushups
+- read webcomice
+- read the news
+- stuff from lunchtime
+
+stats to include an efficiency rating, normalised to 1.0, which is one pomo per 30 mins between start and end time, minus 60mins for lunch
+
+
+== on dependancies ==
+Building the go depends on the go grpc stubs
+That needs protoc + the protoc-gen-go output plugin + the go grpc libs
+The go grpc libs are go, and can be go installed, ending up in $GOPATH/lib to be included
+The protoc-gen-go binary is go, and can be go installed, ending up in $GOPATH/bin to be run
+protoc itself is C++ and needs a standard C++ build environment, not too much tbh
+
+Option 1:
+- install protoc, either with pacakge manager or their zip distribution
+- go -u get grpc libs and protoc-gen-go
+- run protoc (I think it just finds protoc-gen-go on the path) from a shell wrapper that then calls go build
+- or, go has a "generate" verb that might wrap this stuff?
+
+Option 2:
+- Observe that polluting a host system with all these packages is very 90s; installing them all, and a go compiler, into a container is tedious; multi-stage build processes are nasty
+- Use bazel to get and build pinned versions of everything, including protoc
+- Bazel is a cunt

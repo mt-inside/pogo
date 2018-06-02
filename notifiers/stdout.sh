@@ -1,0 +1,1 @@
+docker run -ti -v $PWD:/app grpcc grpcc -i --proto /app/proto/pogo.proto --address 172.18.0.1:50001 -s 'pogobuf.Pogo' --eval 'client.getStatus({}, printReply)' | jq -r '"\(.task.title) - \(.remainingTime)"' | xargs echo
